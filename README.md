@@ -1,66 +1,65 @@
 # Venmito Data Engineering Project
 
+- Sebastian J. Caballero Díaz
+- josiassebastian@gmail.com
+
 ## Introduction
 
-Hello and welcome to this data engineering project for Venmito. We're excited to see how you tackle this challenge and provide us with a solution that can bring together disparate data sources into an insightful and valuable resource.
+Hello and welcome to this data engineering project for Venmito. Venmito is a payment company that allows users to transfer funds to other users and pay in participant stores. The company has several data files in various formats. Our goal is to organize all of this information to gain insights about our clients and transactions. The project is designed to facilitate data consumption for both non-technical and technical users, making it easier to integrate into other systems or applications.
 
-Venmito is a payment company that allows users to transfer funds to other users and pay in participant stores. The company has several data files in various formats. Our goal is to organize all of this information to gain insights about our clients and transactions. We believe that there is an immense value hidden in these data files, and we are looking for a solution that can help us extract and utilize this value.
+### Approach
 
-We have five files:
+The project consists of several components:
 
-- `people.json`
-- `people.yml`
-- `transfers.csv`
-- `transactions.xml`
-- `promotions.csv`
+- Data Ingestion: My program loads the data of each of the 5 files that are in the 'data/' folder, then formats the data accordingly (if needed) to store it in a Pandas DataFrame.
+- Data Matching and Conforming: After successfully storing the data of the five files in dataframes, it matches and conforms the data to find common entities between the data, resolve any inconsistencies, and organize the data to fit the needs. During this process, the data is standardized and merged to create a unified dataset for analysis in the form of 8 new data files in csv, which are stored in the 'new_data/' folder.
+- Data Analysis: Several methods are implemented to help extract information from the data and derive insights from it.
+- Data Output: Built a simple API using Flask, providing a straightforward interface for the technical team to interact with the data. Also created a jupyter notebook where the data insights are displayed in the forms of graphs and tables for the non technical team.
 
-Each of these files contains different pieces of information about our clients, their transactions, transfers and promotions.
+### Technologies Used
 
-Your task is to develop a solution that can read these files, match and conform the data, and provide a way to consume this data.
+- Python- Programming Language used for the project
+- Flask- Framework for building the API
+- Jupyter Notebook- Used for the data analysis and visualization
+- Pandas- Data manipulation library used for the data processing and analysis.
+- Other libraries: Including NumPy, Matplotlib, and others specified in `requirements.txt`
 
-## Requirements
+### Design Decisions
 
-1. **Data Ingestion**: Your solution should be able to read and load data from all the provided files. Take into account that these files are in different formats (JSON, YAML, CSV, XML).
+- Use of the Pandas library and csv files instead of creating a relational database and making use of technologies like PostgreSQL.
+  - This decision was made pretty early on, since I thought it would be easier and more time efficient to use a library like Pandas, and not have to worry about setting up the database and schema. However, given more time, I would prefer to use an actual database.
+- Matching and conforming
+  - Spent a good amount of time on this part, deciding how to approach this problem. After some brainstorming, I ended up with 8 new datasets and wrote them to csv files for persistency.
+  - Combined the people.json and people.yml data -> also had to decide between how to present the devices, location, and names, since they were conflicting formats between the 2 datasets, even though they had the same information. Decided to make the devices into one column, split the city and country in 2 columns, and leave the name as first_name and last_name, as it was in one of the files.
+  - For transactions, I replaced the phone column with the corresponding user id. For Transfers, I created a transfer_id. For Promotions, I replaced the phone and email columns with the corresponding user id. This way, the user_id was in the 4 main dataframes people_df, transfers_df, transactions_df and promotions_df, essentially acting like a foreign key in the latter 3.
+  - After having the 4 main dataframes, I created 4 new ones that are derived from the main ones that I thought might be useful for the later sections. The user transactions dataframe joins transactions and people by user id and keeps relevant info. The user transfers dataframe joins transfers and people by user id and keeps relevant info. The item summary dataframe takes some of the fields from transactions to create new ones such as an item's total revenue, the number of items sold, and the number of transactions that include this item. Similarly I created a store summary dataframe that also shows relevant information for each store such as revenue, total transactions, etc.
+- For the Data Analysis section, I created a number of methods that would extract the information from the new data, providing insight on promotions, stores, items, users, and other extra data.
+- For the output, I decided to go with a Jupyter Notebook approach for the Non-Technical team, that way the program can display graphs and tables for the data obtained in the data analysis. For the Technical team I decided to use flask and use flask endpoints to simulate a RESTful API where the data is converted into json format.
 
-2. **Data Matching and Conforming**: Once the data is loaded, your solution should be capable of matching and conforming the data across these files. This includes identifying common entities, resolving inconsistencies, and organizing the data into a unified format. Furthermore, the consolidated data should not only be transient but also persistent. This persistence should be achieved using appropriate methods such as storing in a file, database, or other suitable data storage solutions, and not restricted to just a variable in memory. This way, the integrity and availability of the consolidated data are ensured for future use and analysis.
+## How to run the program
 
-3. **Data Analysis**: Your solution should be able to process the conformed data to derive insights about our clients and transactions. This would involve implementing data aggregations, calculating relevant metrics, and identifying patterns. These insights will be invaluable in helping us understand our clientele and transaction trends better. Examples of things, but is not restricted to, we want to be able to see are:
-    - Which clients have what type of promotion?
-    - Give suggestions on how to turn "No" responses from clients in the promotions file.
-    - Insights on stores, like:
-        - What item is the best seller?
-        - What store has had the most profit?
-        - Etc.
-    - How can we use the data we got from the transfer file?
-  
-    These are only suggestions. Please don't limit yourself to only these examples and explore in your analysis any other suggestions could be beneficial for Venmito.
+Clone the repository into a folder of your choosing.
+`git clone <url>`
 
-4. **Data Output**: The final output of your solution should enable us to consume the reorganized and analyzed data in a meaningful way. This could be, but is not restricted to, a command line interface (CLI), a database with structured schemas, a GUI featuring interactive visualizations, a Jupyter Notebook, or a RESTful API. We invite you to leverage other innovative methods that you believe would be beneficial for a company like Venmito. Please provide at least 2 data consumption methods, 1 for the non-technical team and 1 for the technical team.
+Make sure to be in the folder that the program is in.
+`cd <directory>`
 
-5. **Code**: The code for your solution should be well-structured and comprehensible, with comments included where necessary. Remember, the quality and readability of the code will be a significant factor in the evaluation of the final deliverable.
+Then, make sure to install the necessary requirements from the `requirements.txt` file.
+`pip install -r requirements.txt`
 
-Note: The examples provided in these requirements (such as GUI, RESTful API etc.) are purely illustrative. You are free to employ any solution or technology you deem fit for fulfilling these requirements
+Now, you can run the `main.py` file:
+`$ python main.py`
 
-## Deliverables
+Now the flask server should have started. Navigate to http://127.0.0.1:5000/ in your browser or http://localhost:5000/
 
-1. Source code.
-2. A README file with your name, email, a description of your solution, your design decisions, and clear instructions on how to run your code.
-3. A method to consume the reorganized and analyzed data.
+You should see a message that says "Welcome to Venmito API!". Now you can navigate to the different routes, for example http://127.0.0.1:5000/top_spenders/5 to see the information of the top 5 users that have spent the most in a json format.
 
-## Instructions for Submission
+The technical team can navigate to the routes and get the information needed in json format. For the non-technical team, go to the `data_output.ipynb` file, and run the cells. Here, you can see the different information either in graphs or tables for all of the methods that are in the `data_analysis.py` file. This is the same information that you can find in the flask endpoints, but in a easier way to visualize.
 
-1. Complete your project as described above in a branch within your fork.
-2. Write a detailed README file with your name, email, a description explaining your approach, the technologies you used, and provides clear instructions on how to run your code.
-3. Submit your project by creating a pull request to merge your branch to the main branch of your fork.
+### Future Improvements
 
-We look forward to seeing your solution!
-
-Thank you,
-
-Venmito
-
-## DISCLAIMER:
-
-This project and its contents are the exclusive property of Xtillion, LLC and are intended solely for the evaluation of the individual to whom it was provided. Any distribution, reproduction, or unauthorized use is strictly prohibited. By accessing and using this project, you agree to abide by these conditions. Failure to comply with these terms may result in legal action.
-
-Please note that this project is provided "as is", without warranty of any kind, express or implied. Xtillion is not liable for any damages or claims that might arise from using or misusing this project.
+- Validations and error handling: Although my program includes some validations, there can never be enough validations so with more time, more validations should be added.
+- Add unit testing
+- Database Integration
+- Create API documentation
+- Develop a frontend interface
